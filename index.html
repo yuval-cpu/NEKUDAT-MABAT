@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>נקודת מבט | זירת העובדות</title>
+<!-- קישור תקין ל-Tailwind CSS -->
+<script src="https://www.google.com/search?q=https://cdn.tailwindcss.com"></script>
+<!-- קישור תקין לגופן Assistant -->
+<link href="https://www.google.com/search?q=https://fonts.googleapis.com/css2%3Ffamily%3DAssistant:wght%40400%3B700%3B800%26display%3Dswap" rel="stylesheet">
+<style>
+body {
+font-family: 'Assistant', sans-serif;
+background-color: #f3f4f6;
+}
+.n12-red { color: #d71920; }
+.card {
+background: white;
+border-radius: 12px;
+overflow: hidden;
+box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+transition: 0.3s;
+cursor: pointer;
+}
+.card:hover { transform: translateY(-5px); }
+.image-placeholder {
+background-color: #e5e7eb;
+display: flex;
+align-items: center;
+justify-content: center;
+color: #9ca3af;
+font-weight: bold;
+height: 192px;
+}
+</style>
+</head>
+<body>
+<header class="bg-white border-b p-4 shadow-sm sticky top-0 z-50">
+<div class="container mx-auto flex justify-between items-center">
+<div class="text-3xl font-black n12-red tracking-tighter">נקודת<span class="text-slate-800">מבט</span></div>
+<div class="text-sm font-bold text-gray-500 italic">זירת העובדות והערכים</div>
+</div>
+</header>
+
+<main class="container mx-auto px-4 py-10">
+    <div id="news-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <!-- הכתבות יופיעו כאן באמצעות ה-JavaScript -->
+    </div>
+</main>
+
+<script>
+    // נתוני הכתבות
+    const newsItems = [
+        {
+            id: 1,
+            category: "פוליטיקה",
+            title: "ועדת חקירה ממלכתית או ממשלתית?",
+            summary: "הוויכוח על גוף החקירה של אירועי המלחמה מחריף.",
+            img: "https://images.unsplash.com/photo-1589391513841-330d832d3fd1?q=80&w=800&auto=format&fit=crop"
+        },
+        {
+            id: 2,
+            category: "כלכלה",
+            title: "סבסוד מעונות היום: בעד ונגד",
+            summary: "האם הסבסוד מעודד עבודה או פוגע ברווחה?",
+            img: "https://images.unsplash.com/photo-1502086223501-7ea6ecd79368?q=80&w=800&auto=format&fit=crop"
+        }
+    ];
+
+    // פונקציית הרינדור שמציגה את הכתבות על המסך
+    function render() {
+        const grid = document.getElementById('news-grid');
+        if (!grid) return;
+
+        grid.innerHTML = newsItems.map(item => `
+            <div class="card" onclick="alert('האתר עובד! בשלב הבא נחבר את ה-AI')">
+                <img src="${item.img}" 
+                     class="w-full h-48 object-cover" 
+                     alt="${item.title}"
+                     onerror="this.onerror=null; this.outerHTML='<div class=\'image-placeholder\'></div>';">
+                <div class="p-5">
+                    <span class="text-red-600 font-bold text-xs">${item.category}</span>
+                    <h3 class="text-xl font-bold mt-1">${item.title}</h3>
+                    <p class="text-gray-600 mt-2 text-sm">${item.summary}</p>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    // הפעלת הפונקציה כשהדף נטען
+    window.onload = render;
+</script>
+
+
+</body>
+</html>
