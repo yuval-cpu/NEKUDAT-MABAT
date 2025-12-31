@@ -7,7 +7,7 @@
     <!-- קישור תקין ל-Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- קישור תקין לגופן Assistant -->
-    <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
         body { 
             font-family: 'Assistant', sans-serif; 
@@ -19,10 +19,13 @@
             border-radius: 12px; 
             overflow: hidden; 
             box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
-            transition: 0.3s; 
+            transition: all 0.3s ease; 
             cursor: pointer; 
         }
-        .card:hover { transform: translateY(-5px); }
+        .card:hover { 
+            transform: translateY(-8px); 
+            box-shadow: 0 12px 20px rgba(0,0,0,0.15);
+        }
         .image-placeholder { 
             background-color: #e5e7eb; 
             display: flex; 
@@ -32,21 +35,45 @@
             font-weight: bold; 
             height: 192px;
         }
+        .tag {
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
     </style>
 </head>
 <body>
     <header class="bg-white border-b p-4 shadow-sm sticky top-0 z-50">
         <div class="container mx-auto flex justify-between items-center">
             <div class="text-3xl font-black n12-red tracking-tighter">נקודת<span class="text-slate-800">מבט</span></div>
-            <div class="text-sm font-bold text-gray-500 italic">זירת העובדות והערכים</div>
+            <nav class="hidden md:flex gap-6 font-bold text-gray-600">
+                <a href="#" class="hover:text-red-600 transition">פוליטיקה</a>
+                <a href="#" class="hover:text-red-600 transition">כלכלה</a>
+                <a href="#" class="hover:text-red-600 transition">חברה</a>
+            </nav>
+            <div class="text-sm font-bold text-gray-400 italic hidden sm:block">זירת העובדות והערכים</div>
         </div>
     </header>
 
     <main class="container mx-auto px-4 py-10">
+        <div class="mb-10 text-center">
+            <h1 class="text-4xl font-extrabold text-slate-800 mb-2">הכותרות שמעסיקות את המדינה</h1>
+            <p class="text-gray-500">ניתוח אובייקטיבי של עובדות מול דעות</p>
+        </div>
+
         <div id="news-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             <!-- הכתבות יופיעו כאן -->
         </div>
     </main>
+
+    <footer class="bg-slate-800 text-white py-10 mt-20">
+        <div class="container mx-auto px-4 text-center">
+            <div class="text-2xl font-black mb-4">נקודת<span class="text-red-500">מבט</span></div>
+            <p class="text-gray-400 text-sm">כל הזכויות שמורות &copy; 2024 | פותח כפרויקט דמו לבדיקת עובדות</p>
+        </div>
+    </footer>
 
     <script>
         const newsItems = [
@@ -54,19 +81,32 @@
                 id: 1,
                 category: "פוליטיקה",
                 title: "ועדת חקירה ממלכתית או ממשלתית?",
-                summary: "הוויכוח על גוף החקירה של אירועי המלחמה מחריף.",
+                summary: "מה ההבדל המשפטי בין שתי הוועדות ומי קובע את סמכויותיהן? צללנו לעומק החוק.",
                 img: "https://images.unsplash.com/photo-1589391513841-330d832d3fd1?q=80&w=800&auto=format&fit=crop"
             },
             {
                 id: 2,
                 category: "כלכלה",
                 title: "סבסוד מעונות היום: בעד ונגד",
-                summary: "האם הסבסוד מעודד עבודה או פוגע ברווחה?",
+                summary: "האם הסבסוד מעודד יציאה לעבודה או מהווה נטל על הקופה הציבורית? הנתונים המלאים.",
                 img: "https://images.unsplash.com/photo-1502086223501-7ea6ecd79368?q=80&w=800&auto=format&fit=crop"
+            },
+            {
+                id: 3,
+                category: "ביטחון",
+                title: "טכנולוגיית היירוט החדשה של ישראל",
+                summary: "מערכת הלייזר 'מגן אור' נכנסת לשלבי ניסוי מתקדמים. כך זה יעבוד בשטח.",
+                img: "https://images.unsplash.com/photo-1551135049-8a33b5883817?q=80&w=800&auto=format&fit=crop"
+            },
+            {
+                id: 4,
+                category: "חברה",
+                title: "משבר הדיור: האם המחירים בדרך למטה?",
+                summary: "סקירת שוק הנדל\"ן ברבעון האחרון מגלה מגמות מפתיעות בפריפריה.",
+                img: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?q=80&w=800&auto=format&fit=crop"
             }
         ];
 
-        // פונקציה לטיפול בשגיאות טעינת תמונה בצורה בטוחה
         function handleImageError(imgElement) {
             const placeholder = document.createElement('div');
             placeholder.className = 'image-placeholder';
@@ -77,21 +117,34 @@
         function render() {
             const grid = document.getElementById('news-grid');
             if (!grid) return;
+            
             grid.innerHTML = newsItems.map(item => `
-                <div class="card" onclick="alert('האתר עובד!')">
+                <div class="card" onclick="console.log('מעבר לכתבה: ${item.id}')">
                     <img src="${item.img}" 
                          class="w-full h-48 object-cover" 
                          alt="${item.title}" 
                          onerror="handleImageError(this)">
-                    <div class="p-5">
-                        <span class="text-red-600 font-bold text-xs">${item.category}</span>
-                        <h3 class="text-xl font-bold mt-1">${item.title}</h3>
-                        <p class="text-gray-600 mt-2 text-sm">${item.summary}</p>
+                    <div class="p-6">
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="tag bg-red-100 text-red-600">${item.category}</span>
+                            <span class="text-gray-400 text-xs italic">5 דקות קריאה</span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2 text-slate-800">${item.title}</h3>
+                        <p class="text-gray-600 text-sm leading-relaxed">${item.summary}</p>
+                        <div class="mt-4 pt-4 border-t border-gray-100 flex justify-between items-center">
+                            <span class="text-red-600 font-bold text-sm">קרא עוד ←</span>
+                            <div class="flex gap-2">
+                                <button class="text-gray-400 hover:text-blue-500 transition"><i class="fas fa-share-alt"></i></button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             `).join('');
         }
+
         window.onload = render;
     </script>
+    <!-- הוספת אייקונים של FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </body>
 </html>
