@@ -1,335 +1,270 @@
 import React, { useState, useEffect } from 'react';
-import { initializeApp } from 'firebase/app';
-import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from 'firebase/auth';
-import { getFirestore, doc, setDoc, getDoc, collection, onSnapshot, updateDoc, increment } from 'firebase/firestore';
-
-// --- Firebase Configuration ---
-const firebaseConfig = JSON.parse(__firebase_config);
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-const appId = typeof __app_id !== 'undefined' ? __app_id : 'perspective-v2-final';
+import { 
+  Wand2, 
+  Newspaper, 
+  ArrowRight, 
+  ShieldAlert, 
+  Scale, 
+  Image as ImageIcon,
+  Loader2,
+  PlusCircle,
+  Hash,
+  Search
+} from 'lucide-react';
 
 const App = () => {
-  const [user, setUser] = useState(null);
-  const [activeCategory, setActiveCategory] = useState('All');
+  const [articles, setArticles] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [generatingImage, setGeneratingImage] = useState(false);
   const [selectedArticle, setSelectedArticle] = useState(null);
-  const [votes, setVotes] = useState({});
-  const [userVote, setUserVote] = useState(null);
+  const [topic, setTopic] = useState('');
+  const [view, setView] = useState('feed'); // 'feed' or 'article'
 
-  // --- Auth logic ---
-  useEffect(() => {
-    const initAuth = async () => {
-      if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-        await signInWithCustomToken(auth, __initial_auth_token);
-      } else {
-        await signInAnonymously(auth);
+  const apiKey = "";
+
+  // Helper for exponential backoff
+  const fetchWithRetry = async (url, options, retries = 5) => {
+    for (let i = 0; i < retries; i++) {
+      try {
+        const res = await fetch(url, options);
+        if (res.ok) return await res.json();
+      } catch (e) {
+        if (i === retries - 1) throw e;
+        await new Promise(r => setTimeout(r, Math.pow(2, i) * 1000));
       }
-    };
-    initAuth();
-    const unsubscribe = onAuthStateChanged(auth, setUser);
-    return () => unsubscribe();
-  }, []);
-
-  // --- Global Votes Listener ---
-  useEffect(() => {
-    if (!user) return;
-    const votesCol = collection(db, 'artifacts', appId, 'public', 'data', 'articleVotes');
-    const unsubscribe = onSnapshot(votesCol, (snapshot) => {
-      const votesData = {};
-      snapshot.forEach(doc => {
-        votesData[doc.id] = doc.data();
-      });
-      setVotes(votesData);
-    }, (error) => console.error("Firestore Error:", error));
-    return () => unsubscribe();
-  }, [user]);
-
-  // --- Personal Vote Status ---
-  useEffect(() => {
-    if (!user || !selectedArticle) return;
-    const checkVote = async () => {
-      const userVoteDoc = doc(db, 'artifacts', appId, 'users', user.uid, 'myVotes', selectedArticle.id);
-      const snap = await getDoc(userVoteDoc);
-      if (snap.exists()) {
-        setUserVote(snap.data().side);
-      } else {
-        setUserVote(null);
-      }
-    };
-    checkVote();
-  }, [user, selectedArticle]);
-
-  const handleVote = async (side) => {
-    if (!user || !selectedArticle || userVote) return;
-
-    try {
-      const globalRef = doc(db, 'artifacts', appId, 'public', 'data', 'articleVotes', selectedArticle.id);
-      const globalSnap = await getDoc(globalRef);
-      if (!globalSnap.exists()) {
-        await setDoc(globalRef, { sideA: 0, sideB: 0 });
-      }
-      await updateDoc(globalRef, { [side === 'A' ? 'sideA' : 'sideB']: increment(1) });
-
-      const userRef = doc(db, 'artifacts', appId, 'users', user.uid, 'myVotes', selectedArticle.id);
-      await setDoc(userRef, { side, timestamp: new Date() });
-      setUserVote(side);
-    } catch (err) {
-      console.error("Vote failed:", err);
     }
   };
 
-  const articles = [
-    {
-      id: 'pol-1',
-      cat: 'פוליטיקה',
-      title: 'ועדת חקירה למחדל ה-7 באוקטובר',
-      summary: 'מי צריך לעמוד בראש הגוף שיחקור את הכשל הגדול בתולדות המדינה?',
-      image: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&q=80&w=800',
-      sideA: { 
-        title: 'ועדה ממלכתית בראשות שופט', 
-        content: `העמדה בעד ועדת חקירה ממלכתית נשענת על הצורך באובייקטיביות מוחלטת ובאמון ציבורי רחב. 
-        
-1. **ניתוק מהדרג הפוליטי:** ועדת חקירה ממלכתית ממונה על ידי נשיא בית המשפט העליון. זהו הכלי היחיד שמונע מהנחקרים (הממשלה) לבחור את החוקרים שלהם.
-2. **סמכויות משפטיות:** לועדה כזו יש סמכויות מרחיקות לכת להוצאת צווי הבאה, חקירה באזהרה והטלת אחריות אישית על בכירי הצבא והפוליטיקה.
-3. **מסורת של תיקון:** היסטורית, רק ועדות בראשות שופטים (כמו ועדת אגרנט או ועדת כהן) הצליחו לייצר שינויים מבניים עמוקים במערכת הביטחון הישראלית.
-4. **אמון המשפחות:** רוב מוחלט של משפחות הנופלים והחטופים דורשות גוף שאינו פוליטי כדי להבטיח שהאמת תצא לאור ללא שיקולים של הישרדות קואליציונית.` 
-      },
-      sideB: { 
-        title: 'ועדה בדרג פוליטי/אזרחי', 
-        content: `תומכי הועדה האזרחית טוענים כי שופטים אינם אנשי מקצוע בתחום הביטחון וכי מדובר באירוע בעל משמעויות לאומיות שצריכות להיקבע על ידי נבחרי הציבור.
+  const generateArticle = async () => {
+    if (!topic) return;
+    setLoading(true);
+    
+    try {
+      // 1. Generate Text Content
+      const textPrompt = `צור כתבת חדשות מעמיקה בעברית על הנושא: ${topic}. 
+      הכתבה חייבת לכלול:
+      1. כותרת חזקה.
+      2. תקציר קצר.
+      3. עמדה א' (טיעונים בעד/צד אחד של הקונפליקט).
+      4. עמדה ב' (טיעונים נגד/צד שני של הקונפליקט).
+      5. ניתוח אובייקטיבי של הערכים המתנגשים.
+      החזר את התוצאה במבנה JSON בלבד:
+      {
+        "title": "...",
+        "summary": "...",
+        "sideA": {"title": "...", "content": "..."},
+        "sideB": {"title": "...", "content": "..."},
+        "analysis": "...",
+        "imagePrompt": "A professional news photograph representing [topic] in a neutral, high-quality style"
+      }`;
 
-1. **מומחיות צבאית:** השופטים מומחים בחוק, אך ה-7 באוקטובר הוא כשל אסטרטגי וצבאי. ועדה צריכה להיות מורכבת מאנשי ביטחון, אסטרטגים ומומחי מודיעין שיבינו את הדקויות המבצעיות.
-2. **ריבונות הכנסת:** בדמוקרטיה, הכנסת היא הריבון. ועדת חקירה פרלמנטרית או אזרחית הממונה על ידי הממשלה שומרת על עקרון הפרדת הרשויות ומונעת מ"מדינת המשפט" להשתלט על החלטות מדיניות.
-3. **הקונספציה המשפטית:** המתנגדים לועדת שופטים טוענים כי גם מערכת המשפט הייתה חלק מהקונספציה הכללית שלפני המלחמה, ולכן שופטים אינם יכולים לחקור מערכת שהם חלק ממנה.
-4. **מהירות ויעילות:** ועדות ממלכתיות נוטות להימשך שנים. ועדה אזרחית ממוקדת יכולה להביא מסקנות אופרטיביות מהירות יותר לצורך שיקום המדינה.` 
-      }
-    },
-    {
-      id: 'eco-1',
-      cat: 'כלכלה',
-      title: 'העלאת המע"מ ל-18%: הכרח או טעות?',
-      summary: 'הממשלה מתכננת להעלות את המס כדי לממן את הוצאות המלחמה. האם זו הדרך?',
-      image: 'https://images.unsplash.com/photo-1554224155-1696413565d3?auto=format&fit=crop&q=80&w=800',
-      sideA: { 
-        title: 'תמיכה בהעלאת המע"מ', 
-        content: `כלכלני האוצר טוענים כי מדובר בצעד הכואב אך ההכרחי ביותר כדי לשמור על דירוג האשראי של ישראל.
+      const textResult = await fetchWithRetry(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: textPrompt }] }],
+            generationConfig: { responseMimeType: "application/json" }
+          })
+        }
+      );
 
-1. **גבייה מיידית ורחבה:** מע"מ הוא המס היעיל ביותר. הוא נכנס לקופת המדינה מיד ומכסה את כל שכבות האוכלוסייה, מה שמאפשר לגייס מיליארדים לכיסוי הגירעון שנוצר מהמלחמה.
-2. **אמינות מול שווקים בינלאומיים:** העלאת מיסים מראה לעולם שישראל אחראית פיסקלית. זה מונע הורדת דירוג אשראי נוספת, שעלולה לעלות לנו הרבה יותר בריביות על חובות המדינה.
-3. **מימון הביטחון:** הוצאות הביטחון זינקו בבת אחת. ללא הגדלת הכנסות המדינה, נאלץ לקצץ בבריאות ובחינוך בצורה דרסטית הרבה יותר.` 
-      },
-      sideB: { 
-        title: 'התנגדות להעלאת המע"מ', 
-        content: `המתנגדים טוענים כי המע"מ הוא "מס רגרסיבי" שפוגע הכי קשה בשכבות החלשות ובמעמד הביניים.
+      const articleData = JSON.parse(textResult.candidates[0].content.parts[0].text);
+      
+      // 2. Generate Image
+      setGeneratingImage(true);
+      const imageResult = await fetchWithRetry(
+        `https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict?key=${apiKey}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            instances: { prompt: articleData.imagePrompt },
+            parameters: { sampleCount: 1 }
+          })
+        }
+      );
 
-1. **יוקר המחיה:** העלאת מע"מ פירושה התייקרות מיידית של כל מוצר בסופר, כל שירות וכל קנייה. במדינה שגם כך סובלת מיוקר מחיה קיצוני, זהו מהלך שדוחף משפחות מתחת לקו העוני.
-2. **חניקת הצריכה:** כשהמחירים עולים, אנשים קונים פחות. זה עלול להוביל להאטה כלכלית ואפילו למיתון, מה שבסופו של דבר יוריד את הכנסות המדינה ממיסים אחרים.
-3. **חלופות צודקות יותר:** במקום להעלות מע"מ לכולם, המדינה צריכה לקצץ במשרדים מיותרים, בכספים קואליציוניים ולהעלות מיסים על רווחי יתר של בנקים וחברות ענק.` 
-      }
-    },
-    {
-      id: 'tra-2',
-      cat: 'תחבורה',
-      title: 'תחבורה ציבורית בשבת',
-      summary: 'האם הגיע הזמן לשנות את הסטטוס קוו למען חופש התנועה?',
-      image: 'https://images.unsplash.com/photo-1560177112-fbfd5fde9566?auto=format&fit=crop&q=80&w=800',
-      sideA: { 
-        title: 'בעד תחבורה בשבת', 
-        content: `התומכים רואים בתחבורה הציבורית זכות יסוד שאינה צריכה להיות מוגבלת על ידי דת.
+      const imageUrl = `data:image/png;base64,${imageResult.predictions[0].bytesBase64Encoded}`;
+      
+      const newArticle = {
+        id: Date.now(),
+        ...articleData,
+        image: imageUrl,
+        date: new Date().toLocaleDateString('he-IL'),
+        category: "חדשות AI"
+      };
 
-1. **צדק חברתי:** למי שיש רכב פרטי יכול לנוע בשבת. מי שאין לו כסף לרכב או למוניות (קשישים, צעירים, עניים) נצור בביתו. זהו חוסר שוויון משווע.
-2. **איכות הסביבה והגודש:** הפעלת אוטובוסים בשבת תפחית את הצורך ברכב שני במשפחה ותוריד את העומס בכבישים ובחניונים בחופים ובמרכזי הבילוי.
-3. **חופש מדת:** במדינה דמוקרטית, אין לכפות אורח חיים דתי על הכלל. כל אזרח צריך להיות חופשי לבחור איך לבלות את יום המנוחה שלו.
-4. **כלכלה:** תחבורה ציבורית תאפשר לעובדים במקומות חיוניים ובמרכזי פנאי להגיע לעבודתם בקלות ובזול.` 
-      },
-      sideB: { 
-        title: 'שמירה על הסטטוס קוו', 
-        content: `המתנגדים טוענים כי השבת היא המאפיין הייחודי ביותר של המדינה היהודית ויש לשמור עליה כיום מנוחה לאומי.
-
-1. **זהות יהודית:** השבת היא "כרטיס הביקור" של עם ישראל. פתיחת תחבורה ציבורית תמחק את ההבדל בין יום חול ליום קדוש ותהפוך את ישראל למדינה ככל העמים.
-2. **זכויות עובדים:** אם תהיה תחבורה ציבורית, נהגים, פקחים ומוסכניקים ייאלצו לעבוד בשבת. יום המנוחה השבועי של העובדים החלשים ביותר ייפגע.
-3. **אחדות לאומית:** הסטטוס קוו הוא פשרה עדינה שמאפשרת לדתיים וחילונים לחיות יחד. שבירתו תוביל למלחמת תרבות ולהעמקת השסע בעם.
-4. **צביון המרחב הציבורי:** השקט של יום השבת הוא נכס גם לחילונים רבים. אוטובוסים רועשים בתוך השכונות יפגעו באווירה המיוחדת של יום המנוחה.` 
-      }
+      setArticles([newArticle, ...articles]);
+      setTopic('');
+    } catch (error) {
+      console.error("Generation failed", error);
+    } finally {
+      setLoading(false);
+      setGeneratingImage(false);
     }
-  ];
-
-  // (שאר הכתבות יופיעו במערכת המלאה, כאן פירטתי 3 דוגמאות עומק כפי שביקשת)
-
-  const VoteDisplay = ({ articleId }) => {
-    const data = votes[articleId] || { sideA: 0, sideB: 0 };
-    const total = data.sideA + data.sideB;
-    const pA = total > 0 ? Math.round((data.sideA / total) * 100) : 50;
-    const pB = 100 - pA;
-
-    return (
-      <div className="mt-8 space-y-4">
-        <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-slate-400">
-          <span>{pA}% תמיכה בגישה א'</span>
-          <span>{pB}% תמיכה בגישה ב'</span>
-        </div>
-        <div className="h-10 w-full bg-slate-100 rounded-2xl overflow-hidden flex shadow-inner border border-slate-200 p-1">
-          <div style={{ width: `${pA}%` }} className="bg-blue-600 h-full rounded-xl flex items-center justify-center text-[10px] text-white font-bold transition-all duration-1000 shadow-lg">
-            {total > 0 && `${pA}%`}
-          </div>
-          <div style={{ width: `${pB}%` }} className="bg-slate-800 h-full rounded-xl flex items-center justify-center text-[10px] text-white font-bold transition-all duration-1000 ml-1">
-            {total > 0 && `${pB}%`}
-          </div>
-        </div>
-        <div className="text-center text-[10px] text-slate-400 font-bold uppercase">סה"כ מצביעים: {total}</div>
-      </div>
-    );
   };
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] text-slate-900 font-sans antialiased pb-20" dir="rtl">
-      {/* Navbar */}
-      <header className="bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-50">
-        <div className="container mx-auto px-4 max-w-6xl">
-          <div className="flex justify-between items-center h-20">
-            <div 
-              className="text-3xl font-black text-red-600 tracking-tighter cursor-pointer flex items-center gap-2"
-              onClick={() => {setSelectedArticle(null); setActiveCategory('All');}}
-            >
-              <div className="w-8 h-8 bg-red-600 rounded-lg flex items-center justify-center text-white text-xl">N</div>
-              <span>נקודת<span className="text-slate-800">מבט</span></span>
+    <div className="min-h-screen bg-slate-50 font-sans text-slate-900" dir="rtl">
+      {/* Navigation */}
+      <nav className="bg-white border-b sticky top-0 z-50">
+        <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+          <div 
+            className="flex items-center gap-2 cursor-pointer" 
+            onClick={() => {setView('feed'); setSelectedArticle(null);}}
+          >
+            <div className="bg-red-600 p-1.5 rounded-lg text-white">
+              <Scale size={24} />
             </div>
-            <nav className="hidden md:flex gap-4">
-              {['All', 'פוליטיקה', 'כלכלה', 'תחבורה'].map(cat => (
-                <button 
-                  key={cat}
-                  onClick={() => {setActiveCategory(cat); setSelectedArticle(null);}}
-                  className={`px-4 py-2 rounded-xl text-sm font-black transition-all ${activeCategory === cat ? 'bg-slate-900 text-white shadow-lg' : 'text-slate-500 hover:bg-slate-100'}`}
-                >
-                  {cat === 'All' ? 'כל הכתבות' : cat}
-                </button>
-              ))}
-            </nav>
+            <span className="text-2xl font-black tracking-tighter">נקודת<span className="text-red-600">מבט</span></span>
+          </div>
+          
+          <div className="flex gap-4 items-center">
+            <div className="hidden md:flex bg-slate-100 rounded-full px-4 py-2 items-center gap-2 border border-slate-200">
+              <Search size={16} className="text-slate-400" />
+              <input 
+                type="text" 
+                placeholder="חפש נושא לכתבה..." 
+                className="bg-transparent border-none focus:ring-0 text-sm w-48"
+                value={topic}
+                onChange={(e) => setTopic(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && generateArticle()}
+              />
+            </div>
+            <button 
+              onClick={generateArticle}
+              disabled={loading || !topic}
+              className="bg-slate-900 text-white px-4 py-2 rounded-full text-sm font-bold flex items-center gap-2 hover:bg-slate-800 disabled:opacity-50 transition-all"
+            >
+              {loading ? <Loader2 size={16} className="animate-spin" /> : <Wand2 size={16} />}
+              <span>ייצר כתבה</span>
+            </button>
           </div>
         </div>
-      </header>
+      </nav>
 
-      <main className="container mx-auto px-4 py-12 max-w-6xl">
-        {!selectedArticle ? (
+      <main className="max-w-6xl mx-auto px-4 py-8">
+        {view === 'feed' ? (
           <>
-            <div className="mb-16 max-w-2xl">
-              <h1 className="text-6xl font-black text-slate-900 leading-[1.1] mb-6">לחקור. להעמיק.<br/><span className="text-red-600">להכריע.</span></h1>
-              <p className="text-xl text-slate-500 font-medium leading-relaxed">זירת הדיונים של ישראל. אנחנו מביאים את שתי העמדות הכי חזקות בכל נושא - אתם קוראים, מנתחים ומצביעים.</p>
+            {/* Hero / Generator Stats */}
+            <div className="mb-12 text-center">
+              <h1 className="text-4xl font-black mb-4">זירת החדשות המבוססת AI הראשונה</h1>
+              <p className="text-slate-500 max-w-2xl mx-auto">
+                הזן נושא טעון, והמערכת שלנו תייצר עבורך ניתוח מעמיק, תמונות אילוסטרציה מקוריות ותצוגה מאוזנת של כל צדדי הסוגיה.
+              </p>
             </div>
 
+            {/* Articles Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {articles.filter(a => activeCategory === 'All' || a.cat === activeCategory).map(a => (
+              {articles.length === 0 && !loading && (
+                <div className="col-span-full border-2 border-dashed border-slate-200 rounded-3xl p-20 text-center text-slate-400">
+                  <Newspaper size={48} className="mx-auto mb-4 opacity-20" />
+                  <p>אין עדיין כתבות. הזן נושא למעלה כדי להתחיל.</p>
+                </div>
+              )}
+              
+              {loading && (
+                <div className="bg-white rounded-2xl shadow-sm overflow-hidden animate-pulse border">
+                  <div className="bg-slate-200 h-48 w-full" />
+                  <div className="p-6 space-y-4">
+                    <div className="h-4 bg-slate-200 rounded w-1/4" />
+                    <div className="h-6 bg-slate-200 rounded w-3/4" />
+                    <div className="h-4 bg-slate-200 rounded w-full" />
+                  </div>
+                </div>
+              )}
+
+              {articles.map(article => (
                 <div 
-                  key={a.id}
-                  onClick={() => setSelectedArticle(a)}
-                  className="bg-white rounded-[2.5rem] border border-slate-200 overflow-hidden hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 group cursor-pointer"
+                  key={article.id}
+                  onClick={() => {setSelectedArticle(article); setView('article'); window.scrollTo(0,0);}}
+                  className="bg-white rounded-2xl shadow-sm overflow-hidden border border-slate-200 hover:shadow-xl transition-all cursor-pointer group"
                 >
-                  <div className="h-56 relative overflow-hidden">
-                    <img src={a.image} alt={a.title} className="w-full h-full object-cover group-hover:scale-110 transition duration-700" />
-                    <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-black uppercase text-slate-800 border border-white/20">
-                      {a.cat}
+                  <div className="relative h-48 overflow-hidden">
+                    <img src={article.image} alt={article.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                    <div className="absolute top-4 right-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider">
+                      {article.category}
                     </div>
                   </div>
-                  <div className="p-8">
-                    <h3 className="text-2xl font-black text-slate-800 mb-4 leading-tight group-hover:text-red-600 transition-colors">{a.title}</h3>
-                    <p className="text-slate-500 text-sm leading-relaxed mb-6 line-clamp-2">{a.summary}</p>
-                    <div className="flex justify-between items-center pt-6 border-t border-slate-50">
-                       <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">לחצו לקריאת העמדות</span>
-                       <div className="w-10 h-10 rounded-full bg-slate-900 text-white flex items-center justify-center text-lg group-hover:bg-red-600 transition shadow-lg">←</div>
-                    </div>
+                  <div className="p-6">
+                    <div className="text-slate-400 text-xs mb-2">{article.date}</div>
+                    <h3 className="text-xl font-bold mb-3 leading-tight group-hover:text-red-600 transition-colors">{article.title}</h3>
+                    <p className="text-slate-500 text-sm line-clamp-2 leading-relaxed">{article.summary}</p>
                   </div>
                 </div>
               ))}
             </div>
           </>
         ) : (
+          /* Single Article View */
           <div className="max-w-4xl mx-auto">
             <button 
-              onClick={() => setSelectedArticle(null)} 
-              className="mb-12 font-black text-slate-400 hover:text-red-600 flex items-center gap-3 transition-all group"
+              onClick={() => setView('feed')}
+              className="flex items-center gap-2 text-slate-400 hover:text-slate-900 mb-8 font-bold transition-colors"
             >
-              <span className="bg-slate-100 w-10 h-10 rounded-full flex items-center justify-center group-hover:bg-red-50 group-hover:text-red-600 transition">→</span> 
-              חזרה לזירה המרכזית
+              <ArrowRight size={20} />
+              <span>חזרה לפיד</span>
             </button>
 
-            <article>
-              <header className="mb-16">
-                <span className="text-red-600 text-xs font-black uppercase tracking-[0.3em] mb-4 block">{selectedArticle.cat} | ניתוח עומק</span>
-                <h1 className="text-5xl md:text-7xl font-black text-slate-900 leading-[1] mb-8">{selectedArticle.title}</h1>
-                <p className="text-2xl text-slate-500 font-medium leading-relaxed">{selectedArticle.summary}</p>
-              </header>
-
-              <div className="grid grid-cols-1 gap-12">
-                {/* Side A */}
-                <section className="bg-white rounded-[3rem] p-10 md:p-16 border border-slate-100 shadow-xl shadow-slate-200/50 relative overflow-hidden">
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 rounded-full -mr-16 -mt-16"></div>
-                  <div className="flex items-center gap-6 mb-10">
-                    <div className="w-16 h-16 rounded-[1.5rem] bg-blue-600 flex items-center justify-center text-white text-3xl font-black shadow-xl shadow-blue-200">א</div>
-                    <h2 className="text-3xl font-black text-slate-800 leading-tight">{selectedArticle.sideA.title}</h2>
+            <article className="bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-100">
+              <div className="relative h-[400px]">
+                <img src={selectedArticle.image} className="w-full h-full object-cover" />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent" />
+                <div className="absolute bottom-0 p-10 text-white">
+                  <div className="flex items-center gap-3 mb-4">
+                    <span className="bg-red-600 px-3 py-1 rounded-full text-sm font-bold">ניתוח AI</span>
+                    <span className="text-slate-300 text-sm">{selectedArticle.date}</span>
                   </div>
-                  <div className="text-slate-600 text-xl leading-relaxed whitespace-pre-wrap font-medium mb-12">
-                    {selectedArticle.sideA.content}
-                  </div>
-                  <button 
-                    disabled={userVote}
-                    onClick={() => handleVote('A')}
-                    className={`w-full py-6 rounded-2xl font-black text-lg transition-all ${
-                      userVote === 'A' ? 'bg-blue-600 text-white shadow-xl shadow-blue-200' : 
-                      userVote ? 'bg-slate-100 text-slate-300 cursor-not-allowed' : 
-                      'bg-slate-900 text-white hover:bg-blue-600 hover:-translate-y-1 shadow-2xl'
-                    }`}
-                  >
-                    {userVote === 'A' ? '✓ העמדה שלך' : userVote ? 'הצבעת כבר' : 'אני תומך בעמדה זו'}
-                  </button>
-                </section>
-
-                {/* Side B */}
-                <section className="bg-white rounded-[3rem] p-10 md:p-16 border border-slate-100 shadow-xl shadow-slate-200/50 relative overflow-hidden">
-                  <div className="absolute top-0 left-0 w-32 h-32 bg-slate-500/5 rounded-full -ml-16 -mt-16"></div>
-                  <div className="flex items-center gap-6 mb-10">
-                    <div className="w-16 h-16 rounded-[1.5rem] bg-slate-800 flex items-center justify-center text-white text-3xl font-black shadow-xl shadow-slate-200">ב</div>
-                    <h2 className="text-3xl font-black text-slate-800 leading-tight">{selectedArticle.sideB.title}</h2>
-                  </div>
-                  <div className="text-slate-600 text-xl leading-relaxed whitespace-pre-wrap font-medium mb-12">
-                    {selectedArticle.sideB.content}
-                  </div>
-                  <button 
-                    disabled={userVote}
-                    onClick={() => handleVote('B')}
-                    className={`w-full py-6 rounded-2xl font-black text-lg transition-all ${
-                      userVote === 'B' ? 'bg-slate-800 text-white shadow-xl shadow-slate-200' : 
-                      userVote ? 'bg-slate-100 text-slate-300 cursor-not-allowed' : 
-                      'bg-slate-900 text-white hover:bg-slate-800 hover:-translate-y-1 shadow-2xl'
-                    }`}
-                  >
-                    {userVote === 'B' ? '✓ העמדה שלך' : userVote ? 'הצבעת כבר' : 'אני תומך בעמדה זו'}
-                  </button>
-                </section>
+                  <h1 className="text-4xl md:text-5xl font-black leading-tight">{selectedArticle.title}</h1>
+                </div>
               </div>
 
-              {/* Live Results Section */}
-              <div className="mt-20 bg-slate-900 rounded-[3.5rem] p-12 md:p-20 text-white text-center">
-                 <h3 className="text-4xl font-black mb-4">מה הציבור חושב?</h3>
-                 <p className="text-slate-400 text-lg font-bold mb-12">תוצאות אמת בזמן אמת מקהילת "נקודת מבט"</p>
-                 <div className="max-w-2xl mx-auto">
-                    <VoteDisplay articleId={selectedArticle.id} />
-                 </div>
-                 <div className="mt-12 pt-12 border-t border-slate-800 flex flex-wrap justify-center gap-8">
-                    <div className="text-center">
-                       <div className="text-2xl font-black text-blue-400">{(votes[selectedArticle.id]?.sideA || 0)}</div>
-                       <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">תומכי גישה א'</div>
+              <div className="p-10">
+                <p className="text-2xl text-slate-600 font-light mb-12 leading-relaxed italic border-r-4 border-red-500 pr-6">
+                  {selectedArticle.summary}
+                </p>
+
+                {/* AI Analysis Box */}
+                <div className="bg-indigo-50 rounded-2xl p-8 mb-12 border border-indigo-100 relative overflow-hidden">
+                  <div className="relative z-10">
+                    <div className="flex items-center gap-2 text-indigo-700 font-bold mb-4">
+                      <Wand2 size={20} />
+                      <span>סיכום אובייקטיבי - ניתוח מערכת</span>
                     </div>
-                    <div className="text-center">
-                       <div className="text-2xl font-black text-slate-300">{(votes[selectedArticle.id]?.sideB || 0)}</div>
-                       <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">תומכי גישה ב'</div>
-                    </div>
-                 </div>
+                    <p className="text-indigo-900 leading-relaxed text-lg">
+                      {selectedArticle.analysis}
+                    </p>
+                  </div>
+                  <div className="absolute -bottom-10 -left-10 text-indigo-200/30">
+                    <Scale size={200} />
+                  </div>
+                </div>
+
+                {/* Dual Perspectives */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div className="bg-slate-50 rounded-2xl p-8 border-t-4 border-blue-500">
+                    <h3 className="text-blue-700 font-black text-xl mb-4">{selectedArticle.sideA.title}</h3>
+                    <p className="text-slate-700 leading-relaxed">{selectedArticle.sideA.content}</p>
+                  </div>
+                  <div className="bg-slate-50 rounded-2xl p-8 border-t-4 border-emerald-500">
+                    <h3 className="text-emerald-700 font-black text-xl mb-4">{selectedArticle.sideB.title}</h3>
+                    <p className="text-slate-700 leading-relaxed">{selectedArticle.sideB.content}</p>
+                  </div>
+                </div>
               </div>
             </article>
           </div>
         )}
       </main>
+
+      {/* Footer */}
+      <footer className="mt-20 py-10 border-t bg-white">
+        <div className="max-w-6xl mx-auto px-4 text-center">
+          <span className="text-xl font-black opacity-30 tracking-tighter">נקודת מבט AI</span>
+        </div>
+      </footer>
     </div>
   );
 };
