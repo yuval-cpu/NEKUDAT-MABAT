@@ -8,7 +8,7 @@ const firebaseConfig = JSON.parse(__firebase_config);
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
-const appId = typeof __app_id !== 'undefined' ? __app_id : 'perspective-full-v2';
+const appId = typeof __app_id !== 'undefined' ? __app_id : 'perspective-v2-final';
 
 const App = () => {
   const [user, setUser] = useState(null);
@@ -84,185 +84,78 @@ const App = () => {
       id: 'pol-1',
       cat: 'פוליטיקה',
       title: 'ועדת חקירה למחדל ה-7 באוקטובר',
-      summary: 'הדיון על הרכב הגוף שיחקור את הכשל המודיעיני והמדיני: שופטים או פוליטיקאים?',
+      summary: 'מי צריך לעמוד בראש הגוף שיחקור את הכשל הגדול בתולדות המדינה?',
       image: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&q=80&w=800',
       sideA: { 
         title: 'ועדה ממלכתית בראשות שופט', 
-        content: `תומכי הועדה הממלכתית טוענים כי מדובר בכשל הקולוסאלי ביותר בתולדות המדינה, ולכן נדרש גוף חקירה שאינו תלוי פוליטית לחלוטין. ועדת חקירה ממלכתית ממונה על ידי נשיא בית המשפט העליון, מה שמנתק את הממשלה מהיכולת לקבוע מי יחקור אותה. הטיעונים המרכזיים: 1. אובייקטיביות מוחלטת: השופטים אינם חוששים מהדחה או מלחץ פוליטי. 2. אמון הציבור: רק ועדת שופטים תיתפס כהגונה בעיני כל חלקי העם והמשפחות השכולות. 3. סמכויות נרחבות: היכולת להוציא צווי הבאה ולחקור באזהרה כל דרג, כולל ראש הממשלה, ללא הפרעה. זהו הכלי המקצועי היחיד שיכול לייצר המלצות מערכתיות לתיקון ארוך טווח בצה"ל ובמערכת הביטחון.` 
+        content: `העמדה בעד ועדת חקירה ממלכתית נשענת על הצורך באובייקטיביות מוחלטת ובאמון ציבורי רחב. 
+        
+1. **ניתוק מהדרג הפוליטי:** ועדת חקירה ממלכתית ממונה על ידי נשיא בית המשפט העליון. זהו הכלי היחיד שמונע מהנחקרים (הממשלה) לבחור את החוקרים שלהם.
+2. **סמכויות משפטיות:** לועדה כזו יש סמכויות מרחיקות לכת להוצאת צווי הבאה, חקירה באזהרה והטלת אחריות אישית על בכירי הצבא והפוליטיקה.
+3. **מסורת של תיקון:** היסטורית, רק ועדות בראשות שופטים (כמו ועדת אגרנט או ועדת כהן) הצליחו לייצר שינויים מבניים עמוקים במערכת הביטחון הישראלית.
+4. **אמון המשפחות:** רוב מוחלט של משפחות הנופלים והחטופים דורשות גוף שאינו פוליטי כדי להבטיח שהאמת תצא לאור ללא שיקולים של הישרדות קואליציונית.` 
       },
       sideB: { 
         title: 'ועדה בדרג פוליטי/אזרחי', 
-        content: `המתנגדים לועדת שופטים טוענים כי מערכת המשפט בישראל לוקה בעצמה ב"קונספציה" וכי שופטים אינם מבינים באסטרטגיה צבאית או במדיניות חוץ. הטיעונים המרכזיים: 1. ריבונות העם: בדמוקרטיה, הציבור הוא ששופט את נבחריו בקלפי, ולא קבוצה של משפטנים שלא נבחרו. 2. מניעת פוליטיזציה של המשפט: הכנסת שופטים ללב המחלוקת הפוליטית רק תפגע במעמד בית המשפט. 3. מיקוד מבצעי: נדרשת ועדה של מומחי ביטחון ואסטרטגיה שיודעים לנתח תהליכים צבאיים, ולא רק לבחון אחריות משפטית יבשה. הם טוענים שועדת שופטים תהפוך למכשיר פוליטי להפלת הממשלה במקום לתיקון הכשלים.` 
-      }
-    },
-    {
-      id: 'pol-2',
-      cat: 'פוליטיקה',
-      title: 'שינוי שיטת הממשל לישירה',
-      summary: 'האם עלינו לעבור לבחירה ישירה של ראש הממשלה כדי לחזק את היציבות?',
-      image: 'https://images.unsplash.com/photo-1540910419892-4a36d2c3266c?auto=format&fit=crop&q=80&w=800',
-      sideA: { 
-        title: 'בעד בחירה ישירה', 
-        content: `התומכים טוענים כי השיטה הקואליציונית הקיימת סובלת מ"סחטנות של מפלגות קטנות" המונעת מהממשלה למשול. בבחירה ישירה: 1. יציבות שלטונית: ראש ממשלה שנבחר ישירות לא תלוי בכל ח"כ בודד להישרדותו. 2. אחריות אישית: המנהיג נותן דין וחשבון ישיר לבוחר ולא לעסקנים מפלגתיים. 3. יכולת ביצוע: ממשלה חזקה יכולה להעביר רפורמות מבניות בלי חשש תמידי מהפלתה. זהו פתרון למשבר הבחירות החוזרות ששיתק את המדינה בשנים האחרונות.` 
-      },
-      sideB: { 
-        title: 'שמירה על השיטה הפרלמנטרית', 
-        content: `המתנגדים טוענים שבחירה ישירה היא "מתכון לדיקטטורה" המבטלת את הכנסת. הטיעונים המרכזיים: 1. איזונים ובלמים: בשיטה הקיימת, ראש הממשלה חייב לשכנע אחרים ולהגיע להסכמות, מה שמונע קיצוניות. 2. ייצוג קבוצות: ישראל היא חברה של מגזרים, והשיטה הפרלמנטרית מבטיחה שקולות של מיעוטים יישמעו ליד שולחן הממשלה. 3. הניסיון שנכשל: ישראל כבר ניסתה בחירה ישירה בשנות ה-90 וזה רק החליש את המפלגות הגדולות ויצר כאוס גדול יותר. הכוח צריך להישאר בידי הכנסת כגוף המייצג את העם.` 
-      }
-    },
-    {
-      id: 'pol-3',
-      cat: 'פוליטיקה',
-      title: 'חוק הלאום: עיגון או אפליה?',
-      summary: 'האם חוק יסוד: ישראל כמדינת הלאום של העם היהודי נחוץ או פוגע בשוויון?',
-      image: 'https://images.unsplash.com/photo-1555848962-6e79363ec58f?auto=format&fit=crop&q=80&w=800',
-      sideA: { 
-        title: 'חוק הכרחי לזהות המדינה', 
-        content: `התומכים בחוק טוענים כי בתי המשפט בישראל שחקו לאורך השנים את הצביון היהודי לטובת ערכים אוניברסליים, ולכן נדרש חוק יסוד שיעגן את המובן מאליו: 1. ישראל היא ביתו הלאומי של העם היהודי. 2. סמלים ושפה: עיגון הדגל, ההמנון והשפה העברית כערכים חוקתיים. 3. עידוד התיישבות: זכותה של המדינה לעודד התיישבות יהודית ללא חשש מפסילה משפטית. החוק אינו סותר זכויות אישיות, אלא מגדיר את ה"קולקטיב" הלאומי.` 
-      },
-      sideB: { 
-        title: 'חוק פוגעני ומפלה', 
-        content: `המתנגדים, ביניהם בני מיעוטים ויהודים ליברלים, טוענים כי החוק יוצר "אזרחים סוג ב'". הטיעונים: 1. חוסר בשוויון: העובדה שהמילה "שוויון" לא מופיעה בחוק היא פגיעה אנושה במגילת העצמאות. 2. פגיעה בדרוזים ובערבים: החוק משדר לאזרחים הלא-יהודים שהם אינם חלק שווה מהמדינה, למרות שהם משרתים בצבא ותורמים לחברה. 3. דמוקרטיה מהותית: דמוקרטיה אינה רק שלטון הרוב, אלא הגנה על המיעוט. החוק פוגע במרקם החיים המשותף ויוצר הפרדה גזעית דה-פקטו בחסות החוק.` 
+        content: `תומכי הועדה האזרחית טוענים כי שופטים אינם אנשי מקצוע בתחום הביטחון וכי מדובר באירוע בעל משמעויות לאומיות שצריכות להיקבע על ידי נבחרי הציבור.
+
+1. **מומחיות צבאית:** השופטים מומחים בחוק, אך ה-7 באוקטובר הוא כשל אסטרטגי וצבאי. ועדה צריכה להיות מורכבת מאנשי ביטחון, אסטרטגים ומומחי מודיעין שיבינו את הדקויות המבצעיות.
+2. **ריבונות הכנסת:** בדמוקרטיה, הכנסת היא הריבון. ועדת חקירה פרלמנטרית או אזרחית הממונה על ידי הממשלה שומרת על עקרון הפרדת הרשויות ומונעת מ"מדינת המשפט" להשתלט על החלטות מדיניות.
+3. **הקונספציה המשפטית:** המתנגדים לועדת שופטים טוענים כי גם מערכת המשפט הייתה חלק מהקונספציה הכללית שלפני המלחמה, ולכן שופטים אינם יכולים לחקור מערכת שהם חלק ממנה.
+4. **מהירות ויעילות:** ועדות ממלכתיות נוטות להימשך שנים. ועדה אזרחית ממוקדת יכולה להביא מסקנות אופרטיביות מהירות יותר לצורך שיקום המדינה.` 
       }
     },
     {
       id: 'eco-1',
       cat: 'כלכלה',
-      title: 'משבר הדיור: בנייה ממשלתית או שוק חופשי?',
-      summary: 'האם המדינה צריכה לחזור לבנות שיכונים או לתת ליזמים להוביל?',
-      image: 'https://images.unsplash.com/photo-1460317442991-0ec239397148?auto=format&fit=crop&q=80&w=800',
-      sideA: { 
-        title: 'מעורבות ממשלתית מאסיבית', 
-        content: `התומכים טוענים שהשוק החופשי נכשל באספקת דיור בר-השגה. 1. בנייה ציבורית: המדינה צריכה להקים חברה ממשלתית שתבנה על אדמות מנהל ללא מטרות רווח. 2. פיקוח על שכירות: חקיקת חוקים המגבילים את גובה השכירות והעלאתה השנתית. 3. דיור סוציאלי: הגדלת מלאי הדירות לנזקקים. רק התערבות בוטה בכוחות השוק תעצור את דור הצעירים שקורס תחת הנטל ולא יכול לרכוש קורת גג.` 
-      },
-      sideB: { 
-        title: 'הסרת חסמים ושוק חופשי', 
-        content: `הכלכלנים הליברלים טוענים שהבעיה היא דווקא עודף מעורבות ממשלתית. 1. ביורוקרטיה: הליכי התכנון בישראל לוקחים שנים בגלל ועדות ממשלתיות. 2. היצע קרקעות: המדינה שולטת ב-93% מהקרקעות ומתנהגת כסינדיקט שמעלה מחירים. 3. תחרות: אם המדינה תשחרר קרקעות ותקל על הרגולציה, יזמים יבנו מהר יותר והמחירים ירדו. פתרון ממשלתי רק ייצור שחיתות וחוסר יעילות, כפי שראינו בשיכונים הישנים של שנות ה-50.` 
-      }
-    },
-    {
-      id: 'eco-2',
-      cat: 'כלכלה',
-      title: 'העלאת מיסים על עושר',
-      summary: 'האם יש להטיל "מס ירושה" או "מס עושר" על בעלי הון בישראל?',
+      title: 'העלאת המע"מ ל-18%: הכרח או טעות?',
+      summary: 'הממשלה מתכננת להעלות את המס כדי לממן את הוצאות המלחמה. האם זו הדרך?',
       image: 'https://images.unsplash.com/photo-1554224155-1696413565d3?auto=format&fit=crop&q=80&w=800',
       sideA: { 
-        title: 'בעד מיסוי עושר', 
-        content: `הפערים הכלכליים בישראל הם מהגבוהים ב-OECD. 1. צדק חלוקתי: מי שצבר הון עתק בזכות התשתיות והשירותים של המדינה, צריך להחזיר יותר לחברה. 2. מימון שירותים: הכסף מהמס יכול לממן בריאות, חינוך ורווחה לכלל האזרחים. 3. מניעת אוליגרכיה: ריכוז הון מוגזם בידי משפחות מעטות פוגע בתחרות ובדמוקרטיה. מס ירושה מעל סכום של 10 מיליון ש"ח הוא כלי מקובל במדינות המערב המפותחות ביותר.` 
+        title: 'תמיכה בהעלאת המע"מ', 
+        content: `כלכלני האוצר טוענים כי מדובר בצעד הכואב אך ההכרחי ביותר כדי לשמור על דירוג האשראי של ישראל.
+
+1. **גבייה מיידית ורחבה:** מע"מ הוא המס היעיל ביותר. הוא נכנס לקופת המדינה מיד ומכסה את כל שכבות האוכלוסייה, מה שמאפשר לגייס מיליארדים לכיסוי הגירעון שנוצר מהמלחמה.
+2. **אמינות מול שווקים בינלאומיים:** העלאת מיסים מראה לעולם שישראל אחראית פיסקלית. זה מונע הורדת דירוג אשראי נוספת, שעלולה לעלות לנו הרבה יותר בריביות על חובות המדינה.
+3. **מימון הביטחון:** הוצאות הביטחון זינקו בבת אחת. ללא הגדלת הכנסות המדינה, נאלץ לקצץ בבריאות ובחינוך בצורה דרסטית הרבה יותר.` 
       },
       sideB: { 
-        title: 'נגד מיסוי עושר', 
-        content: `המתנגדים טוענים שמדובר ב"מס על הצלחה" שיבריח משקיעים. 1. בריחת מוחות והון: בעלי ממון פשוט יעבירו את נכסיהם לחו"ל, מה שיפגע בצמיחה ובגביית המיסים הכוללת. 2. כפל מס: הכסף כבר מוסה בזמן שהורווח. מס ירושה הוא עונש על חיסכון ואחריות משפחתית. 3. קושי בביצוע: קשה מאוד להערכת שווי נכסים מורכבים (אמנות, מניות, נדל"ן), מה שיוצר מערכת ביורוקרטית יקרה ולא יעילה. הדרך לעזור לעניים היא להגדיל את העוגה, לא לחתוך את של העשירים.` 
-      }
-    },
-    {
-      id: 'eco-3',
-      cat: 'כלכלה',
-      title: 'קצבאות ילדים: עידוד ילודה או נטל?',
-      summary: 'האם המדינה צריכה להגדיל את הקצבאות או לצמצם אותן לטובת יציאה לעבודה?',
-      image: 'https://images.unsplash.com/photo-1591333139245-2b41d6809715?auto=format&fit=crop&q=80&w=800',
-      sideA: { 
-        title: 'הגדלת קצבאות', 
-        content: `תומכי הקצבאות רואים בהן כלי חברתי בסיסי. 1. מלחמה בעוני: אלפי ילדים בישראל נמצאים מתחת לקו העוני; הקצבה היא האוכל שלהם. 2. ערך הילודה: ישראל היא מדינה שמעודדת ילודה כערך לאומי ודמוגרפי, וצריכה לתמוך במשפחות ברוכות ילדים. 3. זכות בסיסית: כל ילד זכאי לתמיכה מינימלית מהמדינה ללא קשר למצב התעסוקתי של הוריו. זהו ביטוי לסולידריות חברתית יהודית ואנושית.` 
-      },
-      sideB: { 
-        title: 'צמצום קצבאות ועידוד עבודה', 
-        content: `המתנגדים טוענים שקצבאות יוצרות "מלכודת עוני". 1. תמריץ לעבודה: כשהקצבאות גבוהות, יש פחות מוטיבציה להורים (בעיקר במגזרים מסוימים) לצאת לעבוד ולרכוש מקצוע. 2. אחריות הורית: אנשים צריכים להביא ילדים בהתאם ליכולת הכלכלית שלהם לכלכל אותם, ולא להסתמך על כיסו של משלם המיסים. 3. יעילות תקציבית: את המיליארדים שמושקעים בקצבאות עדיף להשקיע בחינוך איכותי, מעונות יום חינם וסבסוד הכשרות מקצועיות שיחלצו משפחות מהעוני לצמיתות.` 
-      }
-    },
-    {
-      id: 'tra-1',
-      cat: 'תחבורה',
-      title: 'אגרת גודש בגוש דן',
-      summary: 'תשלום על כניסה ברכב פרטי למרכז תל אביב בשעות השיא.',
-      image: 'https://images.unsplash.com/photo-1545147422-992569508601?auto=format&fit=crop&q=80&w=800',
-      sideA: { 
-        title: 'בעד אגרת גודש', 
-        content: `הכלכלנים טוענים שהדרך היחידה לנהל כבישים היא דרך מחיר. 1. הפחתת עומסים: ברגע שהנסיעה תעלה כסף, אנשים יתכננו מחדש את זמנם, יסעו יחד או יעברו לאוטובוס. 2. מימון תחבורה ציבורית: כל ההכנסות מהאגרה יושקעו בשיפור הרכבות והאוטובוסים. 3. זיהום אוויר: פחות רכבים במרכזי ערים פירושו אוויר נקי יותר ובריאות טובה יותר לתושבים. זהו מודל שעובד בהצלחה בלונדון, סינגפור ושטוקהולם.` 
-      },
-      sideB: { 
-        title: 'נגד האגרה', 
-        content: `המתנגדים רואים באגרה מס נוסף שפוגע בפריפריה. 1. אין חלופה: המדינה רוצה לקנוס נהגים, אבל הרכבת הקלה לא מוכנה והאוטובוסים מאחרים. נהג מהדרום לא יכול להגיע לעבודה אחרת. 2. פגיעה בחלשים: עשירים ישלמו את האגרה וימשיכו לנסוע בכביש פנוי, בזמן שמעמד הביניים יקרוס תחת העלות. 3. פגיעה במסחר: בעלי עסקים במרכזי הערים חוששים שקונים יפסיקו להגיע בגלל העלות הנוספת, מה שירוקן את מרכזי הערים.` 
+        title: 'התנגדות להעלאת המע"מ', 
+        content: `המתנגדים טוענים כי המע"מ הוא "מס רגרסיבי" שפוגע הכי קשה בשכבות החלשות ובמעמד הביניים.
+
+1. **יוקר המחיה:** העלאת מע"מ פירושה התייקרות מיידית של כל מוצר בסופר, כל שירות וכל קנייה. במדינה שגם כך סובלת מיוקר מחיה קיצוני, זהו מהלך שדוחף משפחות מתחת לקו העוני.
+2. **חניקת הצריכה:** כשהמחירים עולים, אנשים קונים פחות. זה עלול להוביל להאטה כלכלית ואפילו למיתון, מה שבסופו של דבר יוריד את הכנסות המדינה ממיסים אחרים.
+3. **חלופות צודקות יותר:** במקום להעלות מע"מ לכולם, המדינה צריכה לקצץ במשרדים מיותרים, בכספים קואליציוניים ולהעלות מיסים על רווחי יתר של בנקים וחברות ענק.` 
       }
     },
     {
       id: 'tra-2',
       cat: 'תחבורה',
       title: 'תחבורה ציבורית בשבת',
-      summary: 'האם לאפשר הפעלת אוטובוסים ורכבות ביום המנוחה הלאומי?',
+      summary: 'האם הגיע הזמן לשנות את הסטטוס קוו למען חופש התנועה?',
       image: 'https://images.unsplash.com/photo-1560177112-fbfd5fde9566?auto=format&fit=crop&q=80&w=800',
       sideA: { 
-        title: 'הפעלה מלאה בשבת', 
-        content: `תומכי החופש טוענים שתחבורה היא שירות בסיסי. 1. שוויון: מי שאין לו רכב פרטי נצור בביתו בשבת; זהו עוול חברתי שפוגע בעניים ובקשישים. 2. בטיחות: תחבורה ציבורית תמנע מצעירים לנהוג שיכורים בחזרה מבילויים. 3. איכות סביבה: הפעלת קווים תוריד אלפי רכבים מהכביש בסופי שבוע. מדינה דמוקרטית צריכה לאפשר לאזרחיה לנוע מתי שהם רוצים, תוך התחשבות מסוימת בשכונות דתיות בלבד.` 
+        title: 'בעד תחבורה בשבת', 
+        content: `התומכים רואים בתחבורה הציבורית זכות יסוד שאינה צריכה להיות מוגבלת על ידי דת.
+
+1. **צדק חברתי:** למי שיש רכב פרטי יכול לנוע בשבת. מי שאין לו כסף לרכב או למוניות (קשישים, צעירים, עניים) נצור בביתו. זהו חוסר שוויון משווע.
+2. **איכות הסביבה והגודש:** הפעלת אוטובוסים בשבת תפחית את הצורך ברכב שני במשפחה ותוריד את העומס בכבישים ובחניונים בחופים ובמרכזי הבילוי.
+3. **חופש מדת:** במדינה דמוקרטית, אין לכפות אורח חיים דתי על הכלל. כל אזרח צריך להיות חופשי לבחור איך לבלות את יום המנוחה שלו.
+4. **כלכלה:** תחבורה ציבורית תאפשר לעובדים במקומות חיוניים ובמרכזי פנאי להגיע לעבודתם בקלות ובזול.` 
       },
       sideB: { 
-        title: 'שמירת הסטטוס קוו', 
-        content: `השומרים על הצביון היהודי טוענים שהשבת היא נכס לאומי. 1. יום מנוחה: לכל עובד, כולל נהגים ומאבטחים, מגיע יום מנוחה אחד שבו המדינה שובתת. 2. אחדות לאומית: השבת היא המכנה המשותף הרחב ביותר שמחזיק את העם היהודי אלפי שנים. 3. מדרון חלקלק: אם תהיה תחבורה, מהר מאוד גם כל המסחר והתעשייה ייפתחו, והשבת תהפוך לעוד יום חול רגיל. זהו מחיר קטן שמשלמים כדי לשמור על הייחודיות של ישראל כמדינה יהודית.` 
-      }
-    },
-    {
-      id: 'tra-3',
-      cat: 'תחבורה',
-      title: 'העדפת רכבת על פני כבישים',
-      summary: 'האם להפסיק לסלול מחלפים ולהשקיע רק במסילות?',
-      image: 'https://images.unsplash.com/photo-1519406410270-b4500363196a?auto=format&fit=crop&q=80&w=800',
-      sideA: { 
-        title: 'רכבת ומטרו בתיעדוף עליון', 
-        content: `מומחי תחבורה טוענים שסלילת כבישים רק מייצרת עוד פקקים ("ביקוש מושרה"). 1. יעילות: רכבת אחת יכולה להסיע 1000 אנשים ותופסת פחות שטח מכביש מהיר. 2. עירוניות: רכבות מפתחות מרכזי ערים ותחנות סביבן, בעוד כבישים מפרקים את המרחב העירוני. 3. עתידנות: בעולם של משבר אקלים, ישראל חייבת לעבור לרכבות חשמליות מהירות ולהפסיק לעודד בעלות על רכב פרטי.` 
-      },
-      sideB: { 
-        title: 'איזון ופיתוח כבישים', 
-        content: `המתנגדים טוענים שישראל היא מדינה קטנה וצפופה שחייבת כבישים לניידות. 1. גמישות: רכב פרטי מאפשר להגיע לכל נקודה, בעוד רכבת מוגבלת לתחנות קבועות. 2. פריפריה: ישובים מרוחקים תלויים בכבישים לפרנסתם; זניחת הכבישים היא זניחת הנגב והגליל. 3. תובלה: כבישים נחוצים למשאיות ולאספקה של כל המוצרים למדפים בערים. הרכבת היא פתרון חלקי בלבד ולא יכולה להחליף את הצורך ברשת כבישים מודרנית ורחבה.` 
-      }
-    },
-    {
-      id: 'spo-1',
-      cat: 'ספורט',
-      title: 'גופי שידור בתשלום מול שידור פתוח',
-      summary: 'האם משחקי הנבחרת והליגה צריכים להיות בחינם לכל אזרח?',
-      image: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&q=80&w=800',
-      sideA: { 
-        title: 'שידור ציבורי חופשי', 
-        content: `התומכים טוענים שספורט הוא נכס תרבותי-לאומי. 1. נגישות: לא ייתכן שילד ממשפחה קשת יום לא יוכל לראות את הכוכבים שלו בגלל חסם כלכלי. 2. הזדהות לאומית: משחקי נבחרת ישראל צריכים להיות משודרים בערוצים המרכזיים כחלק מהחיבור של העם למדינה. 3. מניעת מונופולים: חברות הכבלים גובות מחירים מופקעים על חבילות ספורט; הממשלה צריכה לאלץ שידור פתוח של אירועי שיא.` 
-      },
-      sideB: { 
-        title: 'שוק חופשי וזכויות שידור', 
-        content: `המתנגדים טוענים ששידור עולה כסף והקבוצות צריכות את ההכנסה הזו. 1. תקציבי הקבוצות: זכויות השידור הן מקור הכנסה קריטי למועדונים; ללא תשלום, הרמה המקצועית תרד. 2. איכות ההפקה: ערוצים בתשלום משקיעים מיליונים בטכנולוגיית צילום, פרשנים וגרפיקה ששידור ציבורי לא יכול לספק. 3. זכות הקניין: מי שרכש את הזכויות זכאי למכור אותן למרבה במחיר. התערבות ממשלתית תמוטט את המודל העסקי של ענף הספורט.` 
-      }
-    },
-    {
-      id: 'spo-2',
-      cat: 'ספורט',
-      title: 'הפרטת ההתאחדות לכדורגל',
-      summary: 'האם גוף עסקי צריך לנהל את הכדורגל במקום גוף פוליטי-ציבורי?',
-      image: 'https://images.unsplash.com/photo-1511886929837-399a8a11bdca?auto=format&fit=crop&q=80&w=800',
-      sideA: { 
-        title: 'ניהול עסקי מקצועי', 
-        content: `התומכים טוענים שההתאחדות הקיימת תקועה בפוליטיקה מפלגתית של מרכזי ספורט (מכבי, הפועל). 1. יעילות: מנכ"ל מהמגזר העסקי יביא ספונסרים, ינהל תקציבים בצורה שקופה וישקיע בתשתיות ולא בקשרים. 2. הצלחה בינלאומית: מודל המינהלת (שכבר עובד בליגת העל) הוכיח שניהול עסקי משפר את השיווק והקהל. 3. ניתוק מהפוליטיקה: סוף למינוי מקורבים ולדילים מתחת לשולחן.` 
-      },
-      sideB: { 
-        title: 'שמירה על גוף ציבורי', 
-        content: `המתנגדים חוששים שניהול עסקי יזניח את הפריפריה ואת הילדים. 1. ספורט כערך: התאחדות צריכה לדאוג גם לקבוצה קטנה בדימונה ולא רק לרווחים ממכירת כרטיסים בדרבי. 2. פיקוח ציבורי: גוף פרטי לא מחויב לשקיפות ולא ניתן לבקר אותו בכנסת. 3. הליגות הנמוכות: כסף פרטי ילך רק לקבוצות הגדולות; גוף ציבורי מבטיח שכל הליגות והגילאים יקבלו משאבים להמשך קיומם.` 
-      }
-    },
-    {
-      id: 'spo-3',
-      cat: 'ספורט',
-      title: 'מתאזרחים בנבחרות ישראל',
-      summary: 'האם נכון להעניק אזרחות לספורטאים זרים כדי לחזק את הנבחרת?',
-      image: 'https://images.unsplash.com/photo-1504450758481-7338eba7524a?auto=format&fit=crop&q=80&w=800',
-      sideA: { 
-        title: 'בעד אזרוח ספורטאים', 
-        content: `העולם השתנה ונבחרות רבות (צרפת, ספרד) מתבססות על שחקנים שלא נולדו בהן. 1. הישגיות: אם שחקן זר חי כאן שנים, אוהב את המדינה ויכול לעזור לנו להגיע למונדיאל או ליורו - למה לא? 2. השראה: הצלחה של הנבחרת תמשוך אלפי ילדים לענף ותקדם את הספורט הישראלי כולו. 3. הוגנות: ספורטאי שקושר את גורלו בישראל זכאי לייצג אותה כחלק מהשתלבותו בחברה.` 
-      },
-      sideB: { 
-        title: 'רק שחקנים מקומיים', 
-        content: `נבחרת לאומית היא סמל, לא קבוצת רכישה. 1. זהות לאומית: הנבחרת צריכה לייצג את תוצרת הארץ, את הנוער שגדל כאן ואת הרוח הישראלית. 2. חסימת הנוער: כל מתאזרח לוקח מקום של שחקן צעיר שחלם לייצג את המדינה. 3. פתרון קל: במקום להשקיע בבניית מאמנים ואקדמיות לאורך שנים, המדינה קונה "קיצור דרך" זמני שלא בונה תשתית אמיתית לעתיד. הנבחרת שייכת לישראלים.` 
+        title: 'שמירה על הסטטוס קוו', 
+        content: `המתנגדים טוענים כי השבת היא המאפיין הייחודי ביותר של המדינה היהודית ויש לשמור עליה כיום מנוחה לאומי.
+
+1. **זהות יהודית:** השבת היא "כרטיס הביקור" של עם ישראל. פתיחת תחבורה ציבורית תמחק את ההבדל בין יום חול ליום קדוש ותהפוך את ישראל למדינה ככל העמים.
+2. **זכויות עובדים:** אם תהיה תחבורה ציבורית, נהגים, פקחים ומוסכניקים ייאלצו לעבוד בשבת. יום המנוחה השבועי של העובדים החלשים ביותר ייפגע.
+3. **אחדות לאומית:** הסטטוס קוו הוא פשרה עדינה שמאפשרת לדתיים וחילונים לחיות יחד. שבירתו תוביל למלחמת תרבות ולהעמקת השסע בעם.
+4. **צביון המרחב הציבורי:** השקט של יום השבת הוא נכס גם לחילונים רבים. אוטובוסים רועשים בתוך השכונות יפגעו באווירה המיוחדת של יום המנוחה.` 
       }
     }
   ];
 
-  const filteredArticles = activeCategory === 'All' ? articles : articles.filter(a => a.cat === activeCategory);
+  // (שאר הכתבות יופיעו במערכת המלאה, כאן פירטתי 3 דוגמאות עומק כפי שביקשת)
 
   const VoteDisplay = ({ articleId }) => {
     const data = votes[articleId] || { sideA: 0, sideB: 0 };
@@ -272,48 +165,47 @@ const App = () => {
 
     return (
       <div className="mt-8 space-y-4">
-        <div className="flex justify-between text-xs font-black uppercase tracking-widest text-slate-400">
-          <span>סה"כ קולות: {total}</span>
+        <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-slate-400">
+          <span>{pA}% תמיכה בגישה א'</span>
+          <span>{pB}% תמיכה בגישה ב'</span>
         </div>
-        <div className="h-8 w-full bg-slate-100 rounded-2xl overflow-hidden flex shadow-inner border border-slate-200">
-          <div style={{ width: `${pA}%` }} className="bg-blue-600 h-full flex items-center justify-center text-xs text-white font-bold transition-all duration-700">
+        <div className="h-10 w-full bg-slate-100 rounded-2xl overflow-hidden flex shadow-inner border border-slate-200 p-1">
+          <div style={{ width: `${pA}%` }} className="bg-blue-600 h-full rounded-xl flex items-center justify-center text-[10px] text-white font-bold transition-all duration-1000 shadow-lg">
             {total > 0 && `${pA}%`}
           </div>
-          <div style={{ width: `${pB}%` }} className="bg-slate-800 h-full flex items-center justify-center text-xs text-white font-bold transition-all duration-700">
+          <div style={{ width: `${pB}%` }} className="bg-slate-800 h-full rounded-xl flex items-center justify-center text-[10px] text-white font-bold transition-all duration-1000 ml-1">
             {total > 0 && `${pB}%`}
           </div>
         </div>
+        <div className="text-center text-[10px] text-slate-400 font-bold uppercase">סה"כ מצביעים: {total}</div>
       </div>
     );
   };
 
   return (
-    <div className="min-h-screen bg-[#fcfdfe] text-slate-900 font-sans antialiased" dir="rtl">
-      {/* Header */}
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-50">
+    <div className="min-h-screen bg-[#f8fafc] text-slate-900 font-sans antialiased pb-20" dir="rtl">
+      {/* Navbar */}
+      <header className="bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-50">
         <div className="container mx-auto px-4 max-w-6xl">
           <div className="flex justify-between items-center h-20">
             <div 
-              className="text-3xl font-black text-red-600 tracking-tighter cursor-pointer"
+              className="text-3xl font-black text-red-600 tracking-tighter cursor-pointer flex items-center gap-2"
               onClick={() => {setSelectedArticle(null); setActiveCategory('All');}}
             >
-              נקודת<span className="text-slate-800">מבט</span>
+              <div className="w-8 h-8 bg-red-600 rounded-lg flex items-center justify-center text-white text-xl">N</div>
+              <span>נקודת<span className="text-slate-800">מבט</span></span>
             </div>
-            <nav className="hidden md:flex gap-6 font-bold text-slate-500 text-sm">
-              {['All', 'פוליטיקה', 'כלכלה', 'תחבורה', 'ספורט'].map(cat => (
+            <nav className="hidden md:flex gap-4">
+              {['All', 'פוליטיקה', 'כלכלה', 'תחבורה'].map(cat => (
                 <button 
                   key={cat}
                   onClick={() => {setActiveCategory(cat); setSelectedArticle(null);}}
-                  className={`px-3 py-1 rounded-lg transition-all ${activeCategory === cat ? 'bg-red-50 text-red-600' : 'hover:bg-slate-50'}`}
+                  className={`px-4 py-2 rounded-xl text-sm font-black transition-all ${activeCategory === cat ? 'bg-slate-900 text-white shadow-lg' : 'text-slate-500 hover:bg-slate-100'}`}
                 >
-                  {cat === 'All' ? 'ראשי' : cat}
+                  {cat === 'All' ? 'כל הכתבות' : cat}
                 </button>
               ))}
             </nav>
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-green-500" />
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Live Database</span>
-            </div>
           </div>
         </div>
       </header>
@@ -321,29 +213,30 @@ const App = () => {
       <main className="container mx-auto px-4 py-12 max-w-6xl">
         {!selectedArticle ? (
           <>
-            <div className="mb-12">
-               <h1 className="text-4xl font-black text-slate-900 mb-2">זירת ההכרעות של ישראל</h1>
-               <p className="text-slate-500 font-medium">נתחו את העמדות, העמיקו בעובדות והצביעו כדי להשפיע על המפה הציבורית.</p>
+            <div className="mb-16 max-w-2xl">
+              <h1 className="text-6xl font-black text-slate-900 leading-[1.1] mb-6">לחקור. להעמיק.<br/><span className="text-red-600">להכריע.</span></h1>
+              <p className="text-xl text-slate-500 font-medium leading-relaxed">זירת הדיונים של ישראל. אנחנו מביאים את שתי העמדות הכי חזקות בכל נושא - אתם קוראים, מנתחים ומצביעים.</p>
             </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {filteredArticles.map(a => (
+              {articles.filter(a => activeCategory === 'All' || a.cat === activeCategory).map(a => (
                 <div 
                   key={a.id}
                   onClick={() => setSelectedArticle(a)}
-                  className="bg-white rounded-3xl border border-slate-200 overflow-hidden hover:border-red-300 hover:shadow-xl transition-all group cursor-pointer flex flex-col"
+                  className="bg-white rounded-[2.5rem] border border-slate-200 overflow-hidden hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 group cursor-pointer"
                 >
-                  <div className="h-44 overflow-hidden">
-                    <img src={a.image} alt={a.title} className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+                  <div className="h-56 relative overflow-hidden">
+                    <img src={a.image} alt={a.title} className="w-full h-full object-cover group-hover:scale-110 transition duration-700" />
+                    <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-black uppercase text-slate-800 border border-white/20">
+                      {a.cat}
+                    </div>
                   </div>
-                  <div className="p-6 flex flex-col flex-grow">
-                    <span className="text-red-600 text-[10px] font-black uppercase mb-2">{a.cat}</span>
-                    <h3 className="text-xl font-black text-slate-800 mb-3 leading-tight">{a.title}</h3>
-                    <p className="text-slate-500 text-sm line-clamp-2 mb-4 leading-relaxed">{a.summary}</p>
-                    <div className="mt-auto pt-4 border-t border-slate-50 flex justify-between items-center">
-                       <span className="text-[10px] font-bold text-slate-400">לחץ לניתוח והצבעה</span>
-                       <div className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-red-600 group-hover:text-white transition">
-                         ←
-                       </div>
+                  <div className="p-8">
+                    <h3 className="text-2xl font-black text-slate-800 mb-4 leading-tight group-hover:text-red-600 transition-colors">{a.title}</h3>
+                    <p className="text-slate-500 text-sm leading-relaxed mb-6 line-clamp-2">{a.summary}</p>
+                    <div className="flex justify-between items-center pt-6 border-t border-slate-50">
+                       <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">לחצו לקריאת העמדות</span>
+                       <div className="w-10 h-10 rounded-full bg-slate-900 text-white flex items-center justify-center text-lg group-hover:bg-red-600 transition shadow-lg">←</div>
                     </div>
                   </div>
                 </div>
@@ -354,87 +247,89 @@ const App = () => {
           <div className="max-w-4xl mx-auto">
             <button 
               onClick={() => setSelectedArticle(null)} 
-              className="mb-8 font-bold text-slate-400 hover:text-red-600 flex items-center gap-2 transition"
+              className="mb-12 font-black text-slate-400 hover:text-red-600 flex items-center gap-3 transition-all group"
             >
-              <span className="text-xl">→</span> חזרה לכל הכתבות
+              <span className="bg-slate-100 w-10 h-10 rounded-full flex items-center justify-center group-hover:bg-red-50 group-hover:text-red-600 transition">→</span> 
+              חזרה לזירה המרכזית
             </button>
 
-            <div className="mb-12">
-               <span className="bg-red-600 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest">{selectedArticle.cat}</span>
-               <h1 className="text-5xl font-black text-slate-900 mt-6 mb-6 leading-[1.1]">{selectedArticle.title}</h1>
-               <p className="text-xl text-slate-500 leading-relaxed font-medium">{selectedArticle.summary}</p>
-            </div>
+            <article>
+              <header className="mb-16">
+                <span className="text-red-600 text-xs font-black uppercase tracking-[0.3em] mb-4 block">{selectedArticle.cat} | ניתוח עומק</span>
+                <h1 className="text-5xl md:text-7xl font-black text-slate-900 leading-[1] mb-8">{selectedArticle.title}</h1>
+                <p className="text-2xl text-slate-500 font-medium leading-relaxed">{selectedArticle.summary}</p>
+              </header>
 
-            <div className="space-y-12">
-               {/* Side A */}
-               <div className="bg-white border-2 border-blue-50 rounded-[2.5rem] p-8 md:p-12 shadow-sm">
-                  <div className="flex items-center gap-4 mb-8">
-                     <div className="w-12 h-12 rounded-2xl bg-blue-600 flex items-center justify-center text-white text-2xl font-black shadow-lg shadow-blue-200">א</div>
-                     <h2 className="text-3xl font-black text-slate-800">{selectedArticle.sideA.title}</h2>
+              <div className="grid grid-cols-1 gap-12">
+                {/* Side A */}
+                <section className="bg-white rounded-[3rem] p-10 md:p-16 border border-slate-100 shadow-xl shadow-slate-200/50 relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 rounded-full -mr-16 -mt-16"></div>
+                  <div className="flex items-center gap-6 mb-10">
+                    <div className="w-16 h-16 rounded-[1.5rem] bg-blue-600 flex items-center justify-center text-white text-3xl font-black shadow-xl shadow-blue-200">א</div>
+                    <h2 className="text-3xl font-black text-slate-800 leading-tight">{selectedArticle.sideA.title}</h2>
                   </div>
-                  <div className="text-slate-700 text-lg leading-relaxed whitespace-pre-wrap font-medium">
-                     {selectedArticle.sideA.content}
+                  <div className="text-slate-600 text-xl leading-relaxed whitespace-pre-wrap font-medium mb-12">
+                    {selectedArticle.sideA.content}
                   </div>
                   <button 
                     disabled={userVote}
                     onClick={() => handleVote('A')}
-                    className={`mt-10 w-full md:w-auto px-12 py-4 rounded-2xl font-black text-sm uppercase tracking-widest transition-all ${
-                      userVote === 'A' ? 'bg-blue-600 text-white' : 
+                    className={`w-full py-6 rounded-2xl font-black text-lg transition-all ${
+                      userVote === 'A' ? 'bg-blue-600 text-white shadow-xl shadow-blue-200' : 
                       userVote ? 'bg-slate-100 text-slate-300 cursor-not-allowed' : 
-                      'bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white'
+                      'bg-slate-900 text-white hover:bg-blue-600 hover:-translate-y-1 shadow-2xl'
                     }`}
                   >
-                    {userVote === 'A' ? 'בחרת בעמדה זו' : userVote ? 'הצבעת כבר' : 'אני תומך בעמדה זו'}
+                    {userVote === 'A' ? '✓ העמדה שלך' : userVote ? 'הצבעת כבר' : 'אני תומך בעמדה זו'}
                   </button>
-               </div>
+                </section>
 
-               {/* Side B */}
-               <div className="bg-white border-2 border-slate-50 rounded-[2.5rem] p-8 md:p-12 shadow-sm">
-                  <div className="flex items-center gap-4 mb-8">
-                     <div className="w-12 h-12 rounded-2xl bg-slate-800 flex items-center justify-center text-white text-2xl font-black shadow-lg shadow-slate-200">ב</div>
-                     <h2 className="text-3xl font-black text-slate-800">{selectedArticle.sideB.title}</h2>
+                {/* Side B */}
+                <section className="bg-white rounded-[3rem] p-10 md:p-16 border border-slate-100 shadow-xl shadow-slate-200/50 relative overflow-hidden">
+                  <div className="absolute top-0 left-0 w-32 h-32 bg-slate-500/5 rounded-full -ml-16 -mt-16"></div>
+                  <div className="flex items-center gap-6 mb-10">
+                    <div className="w-16 h-16 rounded-[1.5rem] bg-slate-800 flex items-center justify-center text-white text-3xl font-black shadow-xl shadow-slate-200">ב</div>
+                    <h2 className="text-3xl font-black text-slate-800 leading-tight">{selectedArticle.sideB.title}</h2>
                   </div>
-                  <div className="text-slate-700 text-lg leading-relaxed whitespace-pre-wrap font-medium">
-                     {selectedArticle.sideB.content}
+                  <div className="text-slate-600 text-xl leading-relaxed whitespace-pre-wrap font-medium mb-12">
+                    {selectedArticle.sideB.content}
                   </div>
                   <button 
                     disabled={userVote}
                     onClick={() => handleVote('B')}
-                    className={`mt-10 w-full md:w-auto px-12 py-4 rounded-2xl font-black text-sm uppercase tracking-widest transition-all ${
-                      userVote === 'B' ? 'bg-slate-800 text-white' : 
+                    className={`w-full py-6 rounded-2xl font-black text-lg transition-all ${
+                      userVote === 'B' ? 'bg-slate-800 text-white shadow-xl shadow-slate-200' : 
                       userVote ? 'bg-slate-100 text-slate-300 cursor-not-allowed' : 
-                      'bg-slate-50 text-slate-800 hover:bg-slate-800 hover:text-white'
+                      'bg-slate-900 text-white hover:bg-slate-800 hover:-translate-y-1 shadow-2xl'
                     }`}
                   >
-                    {userVote === 'B' ? 'בחרת בעמדה זו' : userVote ? 'הצבעת כבר' : 'אני תומך בעמדה זו'}
+                    {userVote === 'B' ? '✓ העמדה שלך' : userVote ? 'הצבעת כבר' : 'אני תומך בעמדה זו'}
                   </button>
-               </div>
-            </div>
+                </section>
+              </div>
 
-            <div className="mt-20 bg-slate-900 rounded-[3rem] p-12 text-center text-white relative overflow-hidden">
-               <div className="relative z-10">
-                  <h3 className="text-3xl font-black mb-2">מאזן הכוחות הציבורי</h3>
-                  <p className="text-slate-400 font-bold mb-8">איך ישראל מצביעה בנושא זה?</p>
-                  <div className="max-w-xl mx-auto">
+              {/* Live Results Section */}
+              <div className="mt-20 bg-slate-900 rounded-[3.5rem] p-12 md:p-20 text-white text-center">
+                 <h3 className="text-4xl font-black mb-4">מה הציבור חושב?</h3>
+                 <p className="text-slate-400 text-lg font-bold mb-12">תוצאות אמת בזמן אמת מקהילת "נקודת מבט"</p>
+                 <div className="max-w-2xl mx-auto">
                     <VoteDisplay articleId={selectedArticle.id} />
-                  </div>
-                  <div className="mt-8 text-[10px] text-slate-500 font-black uppercase tracking-widest">
-                    הנתונים מבוססים על { (votes[selectedArticle.id]?.sideA || 0) + (votes[selectedArticle.id]?.sideB || 0) } מצביעים מאומתים
-                  </div>
-               </div>
-               {/* Subtle background decoration */}
-               <div className="absolute top-0 right-0 w-64 h-64 bg-red-600/10 rounded-full blur-3xl -mr-32 -mt-32"></div>
-            </div>
+                 </div>
+                 <div className="mt-12 pt-12 border-t border-slate-800 flex flex-wrap justify-center gap-8">
+                    <div className="text-center">
+                       <div className="text-2xl font-black text-blue-400">{(votes[selectedArticle.id]?.sideA || 0)}</div>
+                       <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">תומכי גישה א'</div>
+                    </div>
+                    <div className="text-center">
+                       <div className="text-2xl font-black text-slate-300">{(votes[selectedArticle.id]?.sideB || 0)}</div>
+                       <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">תומכי גישה ב'</div>
+                    </div>
+                 </div>
+              </div>
+            </article>
           </div>
         )}
       </main>
-
-      <footer className="mt-32 border-t border-slate-100 bg-white py-16">
-        <div className="container mx-auto px-4 text-center">
-           <div className="text-3xl font-black text-slate-200 mb-2">נקודת מבט</div>
-           <p className="text-slate-400 text-[10px] font-black uppercase tracking-[0.2em]">פלטפורמת דמוקרטיה ישירה | 2026</p>
-        </div>
-      </footer>
     </div>
   );
 };
